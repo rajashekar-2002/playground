@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Redis Playground</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        select, input {
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+
+        ul {
+            margin-top: 20px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .initiated {
+            background-color: #fff3cd;
+        }
+
+        .success {
+            background-color: #d4edda;
+        }
+
+        .failed {
+            background-color: #f8d7da;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Redis Playground</h2>
+
+<!-- Operation Selection -->
+<select id="operation">
+    <option value="ADD">ADD</option>
+    <option value="DELETE">DELETE</option>
+    <option value="UPDATE">UPDATE</option>
+    <option value="FETCH_ALL">FETCH_ALL</option>
+</select>
+
+<input type="text" id="key" placeholder="Enter Key">
+<input type="text" id="value" placeholder="Enter Value">
+
+<button onclick="sendOperation()">Submit</button>
+
+<ul id="kvAckList"></ul>
+
+<script>
+
+    let stompClient = null;
+
+    // Connect WebSocket
+    function connect() {
+
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+
+            console.log("Connected to WebSocket");
+
+            stompClient.subscribe('/topic/kv-updates', function (message) {
+                showKVAck(message.body);
+            });
+        });
+    }
+
+    connect();
+
+    // Send operation
+    function sendOperation() {
+
+        const operation = document.getElementById("operation").value;
+        const key = document.getElementById("key").value;
+        const value = document.getElementById("value").value;
+
+        stompClient.send("/app/operate", {}, JSON.stringify({
+            operation: operation,
+            key: key,
+            value: value
+        }));
+
+        document.getElementById("key").value = "";
+        document.getElementById("value").value = "";
+    }
+
+    // Disable value field for certain operations
+    document.getElementById("operation").addEventListener("change", function () {
+
+        const op = this.value;
+        const valueInput = document.getElementById("value");
+
+        if (op === "DELETE" || op === "FETCH_ALL") {
+            valueInput.disabled = true;
+            valueInput.value = "";
+        } else {
+            valueInput.disabled = false;
+        }
+    });
+
+    // Display event
+    function showKVAck(message) {
+
+        const data = JSON.parse(message);
+
+        const ul = document.getElementById('kvAckList');
+        const li = document.createElement('li');
+
+        let statusClass = "initiated";
+
+        if (data.status === "SUCCESS") statusClass = "success";
+        if (data.status === "FAILED") statusClass = "failed";
+
+        li.className = statusClass;
+
+        li.innerHTML =
+            `<strong>${data.operation}</strong> →
+             Key: <b>${data.key || '-'}</b>
+             ${data.value ? "| Value: <b>" + data.value + "</b>" : ""}
+             <br>Status: ${data.status}
+             ${data.message ? "<br>Message: " + data.message : ""}
+             <br><small>${data.completedAt || data.timestamp}</small>`;
+
+        ul.prepend(li);
+    }
+
+</script>
+
+</body>
+</html>
