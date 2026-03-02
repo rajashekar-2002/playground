@@ -193,6 +193,15 @@
             ul.prepend(li);
         }
 
+
+
+        stompClient.subscribe('/topic/kv-updates', function (message) {
+            const response = JSON.parse(message.body);
+            if (response.operation === 'DELETE' && response.status === 'SUCCESS') {
+                removeKeyFromTable(response.key);
+            }
+        });
+
     </script>
 
 </body>
