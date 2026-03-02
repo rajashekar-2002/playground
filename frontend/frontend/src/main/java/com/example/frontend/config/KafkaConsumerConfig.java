@@ -23,10 +23,12 @@ public class KafkaConsumerConfig {
 
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(false);
+        deserializer.setUseTypeHeaders(false);
+        deserializer.setRemoveTypeHeaders(true);
 
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "frontend-group");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "frontend-group-v2");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         return new DefaultKafkaConsumerFactory<>(

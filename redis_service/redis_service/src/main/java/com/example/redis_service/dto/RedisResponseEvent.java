@@ -1,10 +1,15 @@
 package com.example.redis_service.dto;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
+@AllArgsConstructor
 public class RedisResponseEvent {
 
     private String uuid;
@@ -13,6 +18,8 @@ public class RedisResponseEvent {
     private String status; // SUCCESS / FAILED
     private String message;
     private LocalDateTime completedAt;
+
+    private Map<String, String> data; // ← for FETCH_ALL
 
     public RedisResponseEvent() {
     }

@@ -3,6 +3,7 @@ package com.example.frontend.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -16,4 +17,5 @@ public class RedisResponseEvent {
     private String status;
     private String message;
     private LocalDateTime completedAt;
+    private Map<String, String> data;
 }

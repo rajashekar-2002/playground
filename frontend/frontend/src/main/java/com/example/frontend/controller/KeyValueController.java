@@ -40,6 +40,6 @@ public class KeyValueController {
         // Immediately notify frontend UI
         messagingTemplate.convertAndSend("/topic/kv-updates", event);
 
-        System.out.println("Sent to Kafka: " + event);
+        System.out.println("Sent to Kafka: ------------------------------------" + event);
     }
 }

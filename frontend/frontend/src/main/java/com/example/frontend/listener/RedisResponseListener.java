@@ -14,10 +14,10 @@ public class RedisResponseListener {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @KafkaListener(topics = "redis_response_topic", groupId = "frontend-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "redis_response_topic", groupId = "frontend-group-v2", containerFactory = "kafkaListenerContainerFactory")
     public void listen(RedisResponseEvent response) {
 
-        System.out.println("Received response: " + response);
+        System.out.println("Received response: --------------------------------------" + response);
 
         messagingTemplate.convertAndSend(
                 "/topic/kv-updates",

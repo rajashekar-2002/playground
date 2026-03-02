@@ -31,7 +31,9 @@ public class RedisTaskConsumer {
 
             dispatcher.dispatch(event);
 
-            rabbitTemplate.convertAndSend("mongo-queue", event);
+            if (!"FETCH_ALL".equals(event.getOperation())) {
+                rabbitTemplate.convertAndSend("mongo-queue", event);
+            }
 
             channel.basicAck(tag, false);
 
