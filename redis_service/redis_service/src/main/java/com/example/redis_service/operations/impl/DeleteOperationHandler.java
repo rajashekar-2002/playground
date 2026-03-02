@@ -11,25 +11,26 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AddOperationHandler implements RedisOperationHandler {
+public class DeleteOperationHandler implements RedisOperationHandler {
 
     private final StringRedisTemplate redisTemplate;
     private final KafkaTemplate kafkaTemplate;
 
-    public AddOperationHandler(StringRedisTemplate redisTemplate, KafkaTemplate kafkaTemplate) {
+    public DeleteOperationHandler(StringRedisTemplate redisTemplate, KafkaTemplate kafkaTemplate) {
         this.redisTemplate = redisTemplate;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
     public String getOperationType() {
-        return "ADD";
+        return "DELETE";
     }
 
     @Override
     public void handle(RedisEvent event) {
-        redisTemplate.opsForValue()
-                .set(event.getKey(), event.getValue());
+        // Delete the key from Redis
+        redisTemplate.delete(event.getKey());
+        System.out.println("Deleted key from Redis: " + event.getKey());
 
         // send response to frontend
         RedisResponseEvent response = new RedisResponseEvent(
@@ -37,7 +38,7 @@ public class AddOperationHandler implements RedisOperationHandler {
                 event.getKey(),
                 event.getOperation(),
                 "SUCCESS",
-                "Key Added successfully",
+                "Key deleted successfully",
                 LocalDateTime.now());
 
         kafkaTemplate.send("redis_response_topic", response);

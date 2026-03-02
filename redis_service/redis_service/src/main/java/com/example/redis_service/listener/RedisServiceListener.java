@@ -20,10 +20,12 @@ public class RedisServiceListener {
 
         System.out.println("Received from Kafka:-------------------------------------------- " + event);
 
-        // Send to Redis worker queue
+        // Always send to Redis worker queue
         rabbitTemplate.convertAndSend(RabbitConfig.REDIS_QUEUE, event);
 
-        // Send to Mongo worker queue
-        rabbitTemplate.convertAndSend(RabbitConfig.MONGO_QUEUE, event);
+        // Only send to Mongo worker queue if operation is not DELETE
+        if (!"DELETE".equalsIgnoreCase(event.getOperation())) {
+            rabbitTemplate.convertAndSend(RabbitConfig.MONGO_QUEUE, event);
+        }
     }
 }
