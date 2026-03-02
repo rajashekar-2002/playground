@@ -1,13 +1,13 @@
 package com.example.redis_service.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
 @Document(collection = "key_values")
 public class KeyValueDocument {
-
     @Id
     private String id; // MongoDB internal id (UUID from event)
 

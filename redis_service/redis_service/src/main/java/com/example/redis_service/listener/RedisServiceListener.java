@@ -24,8 +24,11 @@ public class RedisServiceListener {
         rabbitTemplate.convertAndSend(RabbitConfig.REDIS_QUEUE, event);
 
         // Only send to Mongo worker queue if operation is not DELETE
-        if (!"DELETE".equalsIgnoreCase(event.getOperation())) {
-            rabbitTemplate.convertAndSend(RabbitConfig.MONGO_QUEUE, event);
+
+        String op = event.getOperation();
+        if (!"DELETE".equalsIgnoreCase(op) && !"FETCH_ALL".equals(op)) {
+            rabbitTemplate.convertAndSend(RabbitConfig.MONGO_QUEUE, event); // use your configured queue
         }
+
     }
 }

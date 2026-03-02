@@ -33,16 +33,29 @@ public class MongoTaskConsumer {
 
         try {
 
-            KeyValueDocument doc = new KeyValueDocument(
-                    event.getUuid(),
-                    event.getKey(),
-                    event.getValue(),
-                    event.getOperation(),
-                    "SUCCESS",
-                    event.getTimestamp(),
-                    LocalDateTime.now());
+            // Check if a document with the same key already exists
+            KeyValueDocument doc = repository.findByKey(event.getKey())
+                    .map(existing -> {
+                        // Update existing document
+                        existing.setValue(event.getValue());
+                        existing.setOperation(event.getOperation());
+                        existing.setStatus("SUCCESS");
+                        existing.setUpdatedAt(LocalDateTime.now());
+                        return existing;
+                    })
+                    .orElseGet(() -> {
+                        // Create new document
+                        return new KeyValueDocument(
+                                event.getUuid(),
+                                event.getKey(),
+                                event.getValue(),
+                                event.getOperation(),
+                                "SUCCESS",
+                                event.getTimestamp(),
+                                LocalDateTime.now());
+                    });
 
-            repository.save(doc);
+            repository.save(doc); // insert or update
 
             // Send FINAL response to frontend
             RedisResponseEvent response = new RedisResponseEvent(
@@ -59,9 +72,7 @@ public class MongoTaskConsumer {
             channel.basicAck(tag, false);
 
         } catch (Exception e) {
-
             e.printStackTrace();
-
             try {
                 channel.basicNack(tag, false, true); // retry
             } catch (Exception nackEx) {
