@@ -81,6 +81,7 @@
         <option value="UPDATE">UPDATE</option>
         <option value="GET">GET</option>
         <option value="SET_TTL">SET_TTL</option>
+        <option value="PAUSE_KAFKA">PAUSE_KAFKA</option>
         <option value="FETCH_ALL">FETCH_ALL</option>
     </select>
 
@@ -152,6 +153,11 @@
                 keyInput.disabled = false;
                 valueInput.disabled = false;
                 valueInput.placeholder = "TTL (max 10 sec)";
+            }
+            else if (op === "PAUSE_KAFKA") {
+                keyInput.disabled = true;
+                valueInput.disabled = false;
+                valueInput.placeholder = "Pause seconds (max 10)";
             }
             else {
                 keyInput.disabled = false;

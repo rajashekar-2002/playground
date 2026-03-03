@@ -6,5 +6,6 @@ public enum OperationType {
     UPDATE,
     FETCH_ALL,
     GET,
-    SET_TTL
+    SET_TTL,
+    PAUSE_KAFKA
 }

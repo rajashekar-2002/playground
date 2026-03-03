@@ -15,7 +15,7 @@ public class RedisServiceListener {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @KafkaListener(topics = "redis_opr_request_topic", groupId = "redis-service-group")
+    @KafkaListener(id = "redisListener", topics = "redis_opr_request_topic", groupId = "redis-service-group")
     public void listen(RedisEvent event) {
 
         System.out.println("Received from Kafka:-------------------------------------------- " + event);
