@@ -11,6 +11,7 @@ public class KeyValueDocument {
     @Id
     private String id; // MongoDB internal id (UUID from event)
 
+    @Indexed(unique = true)
     private String key;
     private String value;
 

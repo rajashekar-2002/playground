@@ -35,25 +35,26 @@ public class MongoTaskConsumer {
 
             // Check if a document with the same key already exists
             KeyValueDocument doc = repository.findByKey(event.getKey())
-                    .map(existing -> {
-                        // Update existing document
-                        existing.setValue(event.getValue());
-                        existing.setOperation(event.getOperation());
-                        existing.setStatus("SUCCESS");
-                        existing.setUpdatedAt(LocalDateTime.now());
-                        return existing;
-                    })
-                    .orElseGet(() -> {
-                        // Create new document
-                        return new KeyValueDocument(
-                                event.getUuid(),
-                                event.getKey(),
-                                event.getValue(),
-                                event.getOperation(),
-                                "SUCCESS",
-                                event.getTimestamp(),
-                                LocalDateTime.now());
-                    });
+                    .orElse(null);
+
+            if (doc != null) {
+                // UPDATE existing
+                doc.setValue(event.getValue());
+                doc.setOperation(event.getOperation());
+                doc.setStatus("SUCCESS");
+                doc.setUpdatedAt(LocalDateTime.now());
+
+            } else {
+                // CREATE new
+                doc = new KeyValueDocument();
+                doc.setId(event.getUuid()); // only set id for new document
+                doc.setKey(event.getKey());
+                doc.setValue(event.getValue());
+                doc.setOperation(event.getOperation());
+                doc.setStatus("SUCCESS");
+                doc.setCreatedAt(event.getTimestamp());
+                doc.setUpdatedAt(LocalDateTime.now());
+            }
 
             repository.save(doc); // insert or update
 
