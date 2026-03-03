@@ -4,5 +4,7 @@ public enum OperationType {
     ADD,
     DELETE,
     UPDATE,
-    FETCH_ALL
+    FETCH_ALL,
+    GET,
+    SET_TTL
 }

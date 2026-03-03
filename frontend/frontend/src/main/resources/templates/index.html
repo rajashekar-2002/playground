@@ -62,6 +62,11 @@
         .failed {
             background-color: #f8d7da;
         }
+
+        input:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -74,6 +79,8 @@
         <option value="ADD">ADD</option>
         <option value="DELETE">DELETE</option>
         <option value="UPDATE">UPDATE</option>
+        <option value="GET">GET</option>
+        <option value="SET_TTL">SET_TTL</option>
         <option value="FETCH_ALL">FETCH_ALL</option>
     </select>
 
@@ -136,14 +143,20 @@
                 keyInput.value = "";
                 valueInput.value = "";
             }
-            else if (op === "DELETE") {
+            else if (op === "DELETE" || op === "GET") {
                 keyInput.disabled = false;
                 valueInput.disabled = true;
                 valueInput.value = "";
             }
+            else if (op === "SET_TTL") {
+                keyInput.disabled = false;
+                valueInput.disabled = false;
+                valueInput.placeholder = "TTL (max 10 sec)";
+            }
             else {
                 keyInput.disabled = false;
                 valueInput.disabled = false;
+                valueInput.placeholder = "Enter Value";
             }
         });
 
